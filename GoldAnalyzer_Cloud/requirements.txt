@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pandas
+numpy
+yfinance
+ta
+beautifulsoup4
+requests
+pytz
+feedparser

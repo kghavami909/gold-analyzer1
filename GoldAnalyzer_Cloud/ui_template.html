@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#04060B">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GoldAnalyzer">
+    <title>Gold Analyzer Pro | ترمینال هوشمند طلا</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23060810'/%3E%3Cpath d='M50 15 L78 35 L68 80 L32 80 L22 35 Z' fill='none' stroke='%23FFD700' stroke-width='4'/%3E%3Ctext x='50' y='60' font-size='26' font-family='sans-serif' font-weight='bold' fill='%23FFD700' text-anchor='middle'%3EXAU%3C/text%3E%3C/svg%3E">
+
+    <style>
+        :root {
+            --bg-deep: #04060B;
+            --bg-card: rgba(10, 14, 26, 0.78);
+            --bg-card-sub: rgba(16, 22, 38, 0.85);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-glass-top: rgba(255, 255, 255, 0.22);
+            
+            /* Neon Cyberpunk Palette */
+            --neon-gold: #FFD700;
+            --neon-gold-glow: rgba(255, 215, 0, 0.45);
+            --neon-cyan: #00F0FF;
+            --neon-cyan-glow: rgba(0, 240, 255, 0.45);
+            --neon-green: #00FF88;
+            --neon-green-glow: rgba(0, 255, 136, 0.5);
+            --neon-red: #FF0055;
+            --neon-red-glow: rgba(255, 0, 85, 0.5);
+            --neon-amber: #FFB703;
+            --neon-amber-glow: rgba(255, 183, 3, 0.4);
+            --neon-purple: #A855F7;
+            --neon-purple-glow: rgba(168, 85, 247, 0.45);
+
+            --text-main: #FFFFFF;
+            --text-muted: #8E9BAE;
+            --text-dim: #556277;
+            
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Vazirmatn, Tahoma, sans-serif;
+            --font-mono: "Consolas", "Courier New", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+            padding-bottom: 95px;
+            user-select: none;
+            perspective: 1200px;
+        }
+
+        /* ── Dynamic Ambient Animated Background ── */
+        .ambient-aurora {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            pointer-events: none;
+            background: 
+                radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 85% 25%, rgba(255, 215, 0, 0.09) 0%, transparent 50%),
+                radial-gradient(circle at 50% 80%, rgba(168, 85, 247, 0.07) 0%, transparent 55%),
+                radial-gradient(circle at 20% 90%, rgba(0, 255, 136, 0.06) 0%, transparent 45%);
+            animation: auroraShift 18s ease-in-out infinite alternate;
+        }
+
+        @keyframes auroraShift {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.08) rotate(1deg); }
+            100% { transform: scale(1.03) rotate(-1deg); }
+        }
+
+        .cyber-grid-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 32px 32px;
+            mask-image: radial-gradient(circle at 50% 40%, black 20%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at 50% 40%, black 20%, transparent 80%);
+        }
+
+        /* ── Header Bar with Glass & Neon Accents ── */
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(4, 6, 11, 0.82);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-bottom: 1px solid var(--border-glass);
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6);
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo-frame {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            border-radius: 10px;
+            box-shadow: 0 0 15px var(--neon-gold-glow);
+        }
+
+        .brand-logo-frame::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--neon-gold), transparent, var(--neon-cyan));
+            z-index: -1;
+            opacity: 0.5;
+            animation: spinRing 6s linear infinite;
+        }
+
+        @keyframes spinRing {
+            100% { transform: rotate(360deg); }
+        }
+
+        .brand-icon {
+            font-size: 20px;
+            color: var(--neon-gold);
+            text-shadow: 0 0 10px var(--neon-gold);
+        }
+
+        .brand-title {
+            font-size: 17px;
+            font-weight: 900;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #FFF 20%, var(--neon-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px var(--neon-gold-glow);
+        }
+
+        .brand-subtitle {
+            font-size: 10px;
+            color: var(--neon-cyan);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 700;
+            text-shadow: 0 0 8px var(--neon-cyan-glow);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-neon {
+            background: rgba(14, 20, 36, 0.7);
+            border: 1px solid var(--border-glass-top);
+            color: #FFF;
+            padding: 7px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            backdrop-filter: blur(15px);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-neon:active {
+            transform: scale(0.94) translateY(2px);
+        }
+
+        .btn-refresh {
+            color: var(--neon-gold);
+            border-color: rgba(255, 215, 0, 0.35);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.15);
+        }
+
+        .btn-refresh:hover {
+            box-shadow: 0 0 18px var(--neon-gold-glow);
+            border-color: var(--neon-gold);
+        }
+
+        #pwa-install-btn {
+            display: none;
+            background: linear-gradient(135deg, var(--neon-gold), #FFA000);
+            color: #04060B;
+            font-weight: 900;
+            border: none;
+            box-shadow: 0 0 16px var(--neon-gold-glow);
+        }
+
+        /* ── Main Container ── */
+        .main-wrapper {
+            max-width: 620px;
+            margin: 0 auto;
+            padding: 14px 16px;
+        }
+
+        /* ── 3D Glassmorphism Cards with Holographic Corners ── */
+        .card-3d {
+            background: var(--bg-card);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1px solid var(--border-glass);
+            border-top: 1px solid var(--border-glass-top);
+            border-radius: 20px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            position: relative;
+            transform-style: preserve-3d;
+            box-shadow: 
+                0 12px 35px rgba(0, 0, 0, 0.55),
+                inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+        }
+
+        /* Cyberpunk Corner HUD Accents */
+        .card-3d::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 14px; height: 14px;
+            border-top: 2px solid var(--neon-gold);
+            border-right: 2px solid var(--neon-gold);
+            border-top-right-radius: 18px;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .card-3d::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 14px; height: 14px;
+            border-bottom: 2px solid var(--neon-cyan);
+            border-left: 2px solid var(--neon-cyan);
+            border-bottom-left-radius: 18px;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* ── Price Card 3D Masterpiece ── */
+        .price-card {
+            background: linear-gradient(135deg, rgba(20, 26, 46, 0.85) 0%, rgba(10, 14, 26, 0.9) 100%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-top: 1px solid rgba(255, 215, 0, 0.45);
+            box-shadow: 
+                0 15px 40px rgba(0, 0, 0, 0.6),
+                0 0 25px rgba(255, 215, 0, 0.12),
+                inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .price-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .price-title-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .live-dot {
+            width: 9px;
+            height: 9px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px var(--neon-green);
+            position: relative;
+        }
+
+        .live-dot::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 1.5px solid var(--neon-green);
+            opacity: 0.8;
+            animation: pulseWave 1.8s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes pulseWave {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(2.3); opacity: 0; }
+        }
+
+        .session-badge {
+            background: rgba(168, 85, 247, 0.12);
+            color: var(--neon-purple);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            padding: 4px 11px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            text-shadow: 0 0 8px var(--neon-purple-glow);
+            box-shadow: 0 0 12px rgba(168, 85, 247, 0.15);
+        }
+
+        .price-center-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin: 6px 0 10px 0;
+        }
+
+        .price-val {
+            font-size: 40px;
+            font-family: var(--font-mono);
+            font-weight: 900;
+            color: var(--neon-gold);
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 15px var(--neon-gold-glow), 0 0 35px rgba(255, 215, 0, 0.25);
+            display: inline-block;
+            transition: all 0.25s ease;
+            transform: translateZ(10px);
+        }
+
+        .price-flash-up {
+            animation: flashGreen 0.85s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .price-flash-down {
+            animation: flashRed 0.85s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes flashGreen {
+            0% { transform: scale(1.08) translateY(-3px); color: var(--neon-green); text-shadow: 0 0 45px var(--neon-green); }
+            100% { transform: scale(1) translateY(0); color: var(--neon-gold); text-shadow: 0 0 15px var(--neon-gold-glow); }
+        }
+
+        @keyframes flashRed {
+            0% { transform: scale(0.94) translateY(3px); color: var(--neon-red); text-shadow: 0 0 45px var(--neon-red); }
+            100% { transform: scale(1) translateY(0); color: var(--neon-gold); text-shadow: 0 0 15px var(--neon-gold-glow); }
+        }
+
+        .update-time-box {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: left;
+            font-family: var(--font-mono);
+        }
+
+        /* ── Dynamic Holographic Signal Card ── */
+        .signal-card {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .signal-card.BUY {
+            border-color: rgba(0, 255, 136, 0.45);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 255, 136, 0.2);
+            background: linear-gradient(180deg, rgba(0, 255, 136, 0.1) 0%, var(--bg-card) 65%);
+        }
+
+        .signal-card.SELL {
+            border-color: rgba(255, 0, 85, 0.45);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 0, 85, 0.2);
+            background: linear-gradient(180deg, rgba(255, 0, 85, 0.1) 0%, var(--bg-card) 65%);
+        }
+
+        .signal-card.WAIT {
+            border-color: rgba(255, 183, 3, 0.35);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6), 0 0 25px rgba(255, 183, 3, 0.15);
+            background: linear-gradient(180deg, rgba(255, 183, 3, 0.08) 0%, var(--bg-card) 65%);
+        }
+
+        .signal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .signal-dir {
+            font-size: 22px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -0.3px;
+        }
+
+        .BUY .signal-dir { color: var(--neon-green); text-shadow: 0 0 14px var(--neon-green-glow); }
+        .SELL .signal-dir { color: var(--neon-red); text-shadow: 0 0 14px var(--neon-red-glow); }
+        .WAIT .signal-dir { color: var(--neon-amber); text-shadow: 0 0 14px var(--neon-amber-glow); }
+
+        .grade-badge {
+            background: var(--bg-card-sub);
+            border: 1px solid var(--border-glass-top);
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 900;
+            color: var(--neon-gold);
+            text-shadow: 0 0 8px var(--neon-gold-glow);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.15);
+        }
+
+        .signal-label-bar {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-right: 3px solid var(--neon-gold);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.5;
+            color: #E2E8F0;
+            margin-bottom: 14px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        /* ── Levels 3D Grid ── */
+        .levels-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .level-box {
+            background: var(--bg-card-sub);
+            border: 1px solid var(--border-glass);
+            border-radius: 14px;
+            padding: 11px 13px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            transform-style: preserve-3d;
+            transition: transform 0.25s ease;
+        }
+
+        .level-box:hover {
+            transform: translateY(-2px);
+        }
+
+        .level-name {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .level-price {
+            font-size: 19px;
+            font-weight: 900;
+            font-family: var(--font-mono);
+            letter-spacing: -0.3px;
+        }
+
+        .entry-val { color: var(--neon-gold); text-shadow: 0 0 10px var(--neon-gold-glow); }
+        .sl-val { color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red-glow); }
+
+        .targets-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .tp-box {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.22);
+            border-radius: 12px;
+            padding: 9px 6px;
+            text-align: center;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+            transition: all 0.25s ease;
+        }
+
+        .tp-title {
+            font-size: 10px;
+            color: var(--neon-green);
+            font-weight: 800;
+            margin-bottom: 3px;
+            text-shadow: 0 0 6px var(--neon-green-glow);
+        }
+
+        .tp-price {
+            font-size: 14px;
+            font-weight: 900;
+            font-family: var(--font-mono);
+            color: #FFF;
+        }
+
+        /* ── Reasons Micro-List ── */
+        .reasons-box {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .reasons-header {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px var(--neon-cyan-glow);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reasons-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .reasons-list li {
+            font-size: 12px;
+            color: #CBD5E1;
+            padding: 7px 11px;
+            background: rgba(255, 255, 255, 0.025);
+            border-radius: 8px;
+            border-right: 2.5px solid var(--neon-gold);
+            line-height: 1.45;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ── ICT Section & 3D Gauge ── */
+        .section-header-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 900;
+            color: #FFF;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .zone-pill {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 800;
+            text-shadow: 0 0 6px currentColor;
+        }
+        .zone-discount { 
+            background: rgba(0, 255, 136, 0.12); 
+            color: var(--neon-green); 
+            border: 1px solid rgba(0, 255, 136, 0.4);
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.2);
+        }
+        .zone-premium { 
+            background: rgba(255, 0, 85, 0.12); 
+            color: var(--neon-red); 
+            border: 1px solid rgba(255, 0, 85, 0.4);
+            box-shadow: 0 0 12px rgba(255, 0, 85, 0.2);
+        }
+        .zone-equilibrium { 
+            background: rgba(0, 240, 255, 0.12); 
+            color: var(--neon-cyan); 
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+        }
+
+        .gauge-wrap {
+            margin: 22px 0 12px 0;
+            position: relative;
+        }
+
+        .ict-gauge {
+            width: 100%;
+            height: 12px;
+            border-radius: 8px;
+            background: linear-gradient(90deg, var(--neon-green) 0%, var(--neon-cyan) 50%, var(--neon-red) 100%);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        .gauge-pointer {
+            position: absolute;
+            top: -6px;
+            width: 22px;
+            height: 22px;
+            background: #FFF;
+            border: 3px solid var(--neon-gold);
+            border-radius: 50%;
+            transform: translateX(50%);
+            transition: left 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 0 15px var(--neon-gold), 0 0 25px rgba(0, 0, 0, 0.8);
+        }
+
+        .gauge-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 8px;
+            color: var(--text-muted);
+        }
+
+        /* ── MTF Trends & Indicators ── */
+        .mtf-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .mtf-box {
+            background: var(--bg-card-sub);
+            border: 1px solid var(--border-glass);
+            border-radius: 14px;
+            padding: 10px 4px;
+            text-align: center;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        }
+
+        .mtf-tf {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .mtf-val {
+            font-size: 12px;
+            font-weight: 900;
+            text-shadow: 0 0 6px currentColor;
+        }
+
+        .trend-bullish { color: var(--neon-green); }
+        .trend-bearish { color: var(--neon-red); }
+        .trend-neutral { color: var(--text-muted); }
+
+        .indicators-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .ind-box {
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 10px 6px;
+            text-align: center;
+        }
+
+        .ind-val {
+            font-size: 18px;
+            font-weight: 900;
+            font-family: var(--font-mono);
+            color: var(--neon-gold);
+            text-shadow: 0 0 8px var(--neon-gold-glow);
+        }
+
+        .ind-lbl {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            font-weight: 700;
+        }
+
+        /* ── Weekly Performance & Archive ── */
+        .weekly-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .w-stat-card {
+            background: var(--bg-card-sub);
+            border: 1px solid var(--border-glass);
+            border-radius: 14px;
+            padding: 14px 6px;
+            text-align: center;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        }
+
+        .w-stat-val {
+            font-size: 22px;
+            font-weight: 900;
+            font-family: var(--font-mono);
+            color: var(--neon-gold);
+            text-shadow: 0 0 10px var(--neon-gold-glow);
+        }
+
+        .w-stat-lbl {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 700;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .history-item {
+            background: var(--bg-card-sub);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 11px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .history-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hist-dir {
+            font-size: 13px;
+            font-weight: 900;
+            padding: 4px 9px;
+            border-radius: 8px;
+        }
+        .hist-dir.BUY { 
+            background: rgba(0, 255, 136, 0.12); 
+            color: var(--neon-green); 
+            border: 1px solid rgba(0, 255, 136, 0.35);
+        }
+        .hist-dir.SELL { 
+            background: rgba(255, 0, 85, 0.12); 
+            color: var(--neon-red); 
+            border: 1px solid rgba(255, 0, 85, 0.35);
+        }
+
+        .hist-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hist-id {
+            font-size: 13px;
+            font-weight: 800;
+            color: #FFF;
+        }
+
+        .hist-time {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        .hist-status {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 14px;
+            text-shadow: 0 0 6px currentColor;
+        }
+        .status-tp { background: rgba(0, 255, 136, 0.12); color: var(--neon-green); border: 1px solid rgba(0, 255, 136, 0.35); }
+        .status-sl { background: rgba(255, 0, 85, 0.12); color: var(--neon-red); border: 1px solid rgba(255, 0, 85, 0.35); }
+        .status-be { background: rgba(0, 240, 255, 0.12); color: var(--neon-cyan); border: 1px solid rgba(0, 240, 255, 0.35); }
+        .status-active { background: rgba(255, 183, 3, 0.12); color: var(--neon-amber); border: 1px solid rgba(255, 183, 3, 0.35); }
+
+        /* ── Tab Views Motion Transition ── */
+        .tab-view {
+            display: none;
+            opacity: 0;
+            transform: translateY(12px) scale(0.98);
+            transition: opacity 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .tab-view.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .slide-in-right { animation: slideInRight 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .slide-in-left { animation: slideInLeft 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .slide-out-right { animation: slideOutRight 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .slide-out-left { animation: slideOutLeft 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+        @keyframes slideInRight {
+            from { transform: translateX(40px) scale(0.96); opacity: 0; }
+            to { transform: translateX(0) scale(1); opacity: 1; }
+        }
+        @keyframes slideInLeft {
+            from { transform: translateX(-40px) scale(0.96); opacity: 0; }
+            to { transform: translateX(0) scale(1); opacity: 1; }
+        }
+        @keyframes slideOutRight {
+            from { transform: translateX(0) scale(1); opacity: 1; }
+            to { transform: translateX(40px) scale(0.96); opacity: 0; }
+        }
+        @keyframes slideOutLeft {
+            from { transform: translateX(0) scale(1); opacity: 1; }
+            to { transform: translateX(-40px) scale(0.96); opacity: 0; }
+        }
+
+        /* ── Floating 3D Bottom Dock Navigation ── */
+        .bottom-dock {
+            position: fixed;
+            bottom: 12px;
+            left: 14px;
+            right: 14px;
+            max-width: 592px;
+            margin: 0 auto;
+            height: 68px;
+            background: rgba(8, 12, 22, 0.88);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--border-glass-top);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            z-index: 1000;
+            box-shadow: 
+                0 15px 45px rgba(0, 0, 0, 0.75),
+                0 0 25px rgba(255, 215, 0, 0.08),
+                inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            padding: 0 4px;
+        }
+
+        /* Smooth Spring Active Indicator Capsule */
+        .dock-indicator {
+            position: absolute;
+            top: 6px;
+            bottom: 6px;
+            width: calc(25% - 8px);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.16), rgba(255, 160, 0, 0.08));
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            border-radius: 18px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: right 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            right: 6px; /* Tab 0 */
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            height: 100%;
+            color: var(--text-muted);
+            cursor: pointer;
+            z-index: 2;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            filter: drop-shadow(0 0 4px transparent);
+            transition: transform 0.25s ease, filter 0.25s ease;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            transition: color 0.25s ease;
+        }
+
+        .nav-item.active .nav-icon {
+            transform: translateY(-2px) scale(1.15);
+            filter: drop-shadow(0 0 8px var(--neon-gold));
+        }
+
+        .nav-item.active .nav-label {
+            color: var(--neon-gold);
+            text-shadow: 0 0 8px var(--neon-gold-glow);
+            font-weight: 900;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-aurora"></div>
+    <div class="cyber-grid-overlay"></div>
+
+    <!-- Header -->
+    <header class="app-header">
+        <div class="brand-container">
+            <div class="brand-logo-frame">
+                <span class="brand-icon">⚜</span>
+            </div>
+            <div>
+                <div class="brand-title">Gold Analyzer</div>
+                <div class="brand-subtitle">Smart Scalp OS</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button id="alarm-toggle-btn" class="btn-neon" onclick="toggleAlarm()" style="padding: 7px 10px;" title="روشن/خاموش کردن هشدار صوتی">
+                <span id="alarm-icon">🔕</span>
+            </button>
+            <button id="pwa-install-btn" class="btn-neon">
+                <span>📲</span> نصب
+            </button>
+            <button id="refresh-btn" class="btn-neon btn-refresh" onclick="manualRefresh()">
+                <span id="refresh-icon">⟳</span> بروزرسانی
+            </button>
+        </div>
+    </header>
+
+    <main class="main-wrapper">
+
+        <!-- 3D Master Price Card (Always on top) -->
+        <div class="card-3d price-card">
+            <div class="price-card-header">
+                <div class="price-title-box">
+                    <span class="live-dot"></span> نرخ لحظه‌ای اونس طلا (XAU/USD)
+                </div>
+                <div id="session-badge" class="session-badge">در حال بررسی...</div>
+            </div>
+
+            <div class="price-center-row">
+                <div id="live-price" class="price-val">----.--</div>
+                <div class="update-time-box">
+                    <div id="last-update" style="color: var(--neon-cyan); font-weight: 700;">--:--:--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 1: DASHBOARD (SIGNAL & ENTRY) -->
+        <section id="tab-dashboard" class="tab-view active">
+            <div id="signal-container" class="card-3d signal-card WAIT">
+                <div class="signal-header">
+                    <div id="signal-dir" class="signal-dir">
+                        <span>⏸</span> وضعیت: صبر (WAIT)
+                    </div>
+                    <div id="signal-grade" class="grade-badge">گرید: —</div>
+                </div>
+
+                <div class="signal-label-bar" id="signal-label">
+                    در حال دریافت داده‌های بازار و تحلیل الگوریتم...
+                </div>
+
+                <!-- Levels Grid -->
+                <div id="levels-container" style="display: none;">
+                    <div class="levels-grid">
+                        <div class="level-box">
+                            <div class="level-name">🎯 نقطه ورود (Entry)</div>
+                            <div id="val-entry" class="level-price entry-val">0.00</div>
+                        </div>
+                        <div class="level-box">
+                            <div class="level-name">🛡️ استاپ‌لاس ساختاری (SL)</div>
+                            <div id="val-sl" class="level-price sl-val">0.00</div>
+                        </div>
+                    </div>
+
+                    <div class="targets-row">
+                        <div class="tp-box">
+                            <div class="tp-title">تارگت ۱ (ریسک‌فری)</div>
+                            <div id="val-tp1" class="tp-price">0.00</div>
+                        </div>
+                        <div class="tp-box">
+                            <div class="tp-title">تارگت ۲ (سود عالی)</div>
+                            <div id="val-tp2" class="tp-price">0.00</div>
+                        </div>
+                        <div class="tp-box">
+                            <div class="tp-title">تارگت ۳ (تارگت نهایی)</div>
+                            <div id="val-tp3" class="tp-price">0.00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reasons Accordion -->
+                <div class="reasons-box">
+                    <div class="reasons-header">⚡ تاییدات اسمارت مانی و پرایس‌اکشن:</div>
+                    <ul id="reasons-list" class="reasons-list">
+                        <li>در حال ارزیابی تاییدات تکنیکال و فیلترهای ضد نویز...</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: ICT SMART MONEY -->
+        <section id="tab-ict" class="tab-view">
+            <div class="card-3d">
+                <div class="section-header-box">
+                    <div class="section-title"><span>🧠</span> ساختار نقدینگی و اسمارت‌مانی (ICT)</div>
+                    <div id="ict-zone-badge" class="zone-pill zone-equilibrium">Equilibrium</div>
+                </div>
+
+                <div style="font-size: 13px; font-weight: 700; color: #E2E8F0; margin-bottom: 4px;">
+                    موقعیت قیمت در رنج معاملاتی (Premium / Discount):
+                </div>
+
+                <div class="gauge-wrap">
+                    <div class="ict-gauge">
+                        <div id="gauge-pointer" class="gauge-pointer" style="left: 50%;"></div>
+                    </div>
+                    <div class="gauge-labels">
+                        <span style="color: var(--neon-green);">ارزان (Discount)</span>
+                        <span style="color: var(--neon-cyan);">تعادل (50%)</span>
+                        <span style="color: var(--neon-red);">گران (Premium)</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="level-box">
+                        <div class="level-name">کف رنج (Range Low)</div>
+                        <div id="ict-low" class="level-price" style="font-size: 16px; color: var(--neon-green);">----</div>
+                    </div>
+                    <div class="level-box">
+                        <div class="level-name">سقف رنج (Range High)</div>
+                        <div id="ict-high" class="level-price" style="font-size: 16px; color: var(--neon-red);">----</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="level-box">
+                        <div class="level-name">🎯 جهت نقدینگی (DOL)</div>
+                        <div id="ict-dol-val" class="level-price" style="font-size: 13px; color: var(--neon-gold); font-weight: 800;">در حال پایش...</div>
+                    </div>
+                    <div class="level-box">
+                        <div class="level-name">🏦 تراز نهادی (00/50/20/80)</div>
+                        <div id="ict-inst-val" class="level-price" style="font-size: 13px; color: var(--neon-cyan); font-weight: 800;">در حال محاسبه...</div>
+                    </div>
+                </div>
+
+                <div class="reasons-box" style="margin-top: 16px;">
+                    <div class="reasons-header">🎯 شکار نقدینگی و بلوک‌های فعال:</div>
+                    <ul id="ict-signals-list" class="reasons-list">
+                        <li>در حال شناسایی سطوح عدم تعادل و سوئپ...</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: MTF & INDICATORS -->
+        <section id="tab-trends" class="tab-view">
+            <div class="card-3d">
+                <div class="section-header-box">
+                    <div class="section-title"><span>📊</span> روند همزمان مولتی‌تایم‌فریم طلا</div>
+                    <div id="mtf-overall" style="font-size: 12px; font-weight: 900; color: var(--neon-gold);">—</div>
+                </div>
+
+                <div class="mtf-grid">
+                    <div class="mtf-box">
+                        <div class="mtf-tf">روزانه (D1)</div>
+                        <div id="mtf-daily" class="mtf-val">—</div>
+                    </div>
+                    <div class="mtf-box">
+                        <div class="mtf-tf">۴ ساعته (H4)</div>
+                        <div id="mtf-h4" class="mtf-val">—</div>
+                    </div>
+                    <div class="mtf-box">
+                        <div class="mtf-tf">۱ ساعته (H1)</div>
+                        <div id="mtf-h1" class="mtf-val">—</div>
+                    </div>
+                    <div class="mtf-box">
+                        <div class="mtf-tf">۱۵ دقیقه (M15)</div>
+                        <div id="mtf-m15" class="mtf-val">—</div>
+                    </div>
+                </div>
+
+                <div style="font-size: 13px; font-weight: 800; color: #FFF; margin: 18px 0 8px 0;">
+                    شاخص‌های تکنیکال کلیدی:
+                </div>
+                <div class="indicators-grid">
+                    <div class="ind-box">
+                        <div id="val-rsi" class="ind-val">--</div>
+                        <div class="ind-lbl">RSI (14)</div>
+                    </div>
+                    <div class="ind-box">
+                        <div id="val-macd" class="ind-val">--</div>
+                        <div class="ind-lbl">MACD Hist</div>
+                    </div>
+                    <div class="ind-box">
+                        <div id="val-ema200" class="ind-val">--</div>
+                        <div class="ind-lbl">EMA 200</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: WEEKLY ARCHIVE & WIN RATE -->
+        <section id="tab-weekly" class="tab-view">
+            <div class="card-3d">
+                <div class="section-header-box">
+                    <div class="section-title"><span>📜</span> کارنامه و بایگانی معاملات هفتگی</div>
+                    <div id="weekly-week-id" style="font-size: 12px; color: var(--neon-gold); font-weight: 800;">هفته جاری</div>
+                </div>
+
+                <div class="weekly-stats-grid">
+                    <div class="w-stat-card">
+                        <div id="stat-winrate" class="w-stat-val" style="color: var(--neon-cyan);">0%</div>
+                        <div class="w-stat-lbl">نرخ برد (Win Rate)</div>
+                    </div>
+                    <div class="w-stat-card">
+                        <div id="stat-total" class="w-stat-val">0</div>
+                        <div class="w-stat-lbl">کل پوزیشن‌ها</div>
+                    </div>
+                    <div class="w-stat-card">
+                        <div id="stat-tp" class="w-stat-val" style="color: var(--neon-green);">0</div>
+                        <div class="w-stat-lbl">سود / تارگت</div>
+                    </div>
+                </div>
+
+                <div id="weekly-summary-text" style="font-size: 12px; color: var(--neon-cyan); text-align: center; margin-bottom: 12px; font-weight: 700;">
+                    در حال محاسبه آمار معاملات هفته...
+                </div>
+
+                <div style="font-size: 13px; font-weight: 800; color: #FFF; margin: 14px 0 8px 0;">
+                    تاریخچه آخرین معاملات:
+                </div>
+                <div id="history-container" class="history-list">
+                    <!-- آیتم‌های تاریخچه به صورت داینامیک اضافه می‌شوند -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Floating 3D Bottom Dock Navigation -->
+    <nav class="bottom-dock">
+        <div id="dock-indicator" class="dock-indicator"></div>
+        <div class="nav-item active" onclick="switchTab('dashboard', this, 0)">
+            <span class="nav-icon">⚡</span>
+            <span class="nav-label">سیگنال</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('ict', this, 1)">
+            <span class="nav-icon">🧠</span>
+            <span class="nav-label">اسمارت‌مانی</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('trends', this, 2)">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">روندها</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('weekly', this, 3)">
+            <span class="nav-icon">📜</span>
+            <span class="nav-label">بایگانی</span>
+        </div>
+    </nav>
+
+    <!-- Scripts -->
+    <script>
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW reg fail:', err));
+        }
+
+        let deferredPrompt;
+        const installBtn = document.getElementById('pwa-install-btn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'flex';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installBtn.style.display = 'none';
+            }
+            deferredPrompt = null;
+        });
+
+        // Tab Switching with spring physics & sliding capsule
+        let currentTabIndex = 0;
+        const tabOrder = ['dashboard', 'ict', 'trends', 'weekly'];
+
+        function switchTab(tabId, el, tabIndex) {
+            const newIndex = (tabIndex !== undefined) ? tabIndex : tabOrder.indexOf(tabId);
+            const oldTab = document.querySelector('.tab-view.active');
+            const newTab = document.getElementById('tab-' + tabId);
+            
+            if (oldTab === newTab) return;
+            
+            const goingRight = newIndex > currentTabIndex;
+            
+            // Clean anim classes
+            document.querySelectorAll('.tab-view').forEach(t => {
+                t.classList.remove('slide-in-left', 'slide-in-right', 'slide-out-left', 'slide-out-right');
+            });
+            
+            // Exit old
+            if (oldTab) {
+                oldTab.classList.remove('active');
+                oldTab.classList.add(goingRight ? 'slide-out-left' : 'slide-out-right');
+                setTimeout(() => {
+                    oldTab.classList.remove('slide-out-left', 'slide-out-right');
+                    oldTab.style.display = 'none';
+                }, 300);
+            }
+            
+            // Enter new
+            newTab.style.display = 'block';
+            newTab.classList.add(goingRight ? 'slide-in-right' : 'slide-in-left');
+            setTimeout(() => {
+                newTab.classList.add('active');
+                newTab.classList.remove('slide-in-left', 'slide-in-right');
+            }, 20);
+            
+            // Update dock items
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            
+            // Move dock capsule (in RTL: index 0 is on right)
+            const dockInd = document.getElementById('dock-indicator');
+            if (dockInd) {
+                dockInd.style.right = `calc(${newIndex * 25}% + 6px)`;
+            }
+            
+            currentTabIndex = newIndex;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Alarm Logic
+        let alarmEnabled = false;
+        // Using a clean alert notification chime
+        const alarmAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+        
+        function toggleAlarm() {
+            alarmEnabled = !alarmEnabled;
+            const icon = document.getElementById('alarm-icon');
+            const btn = document.getElementById('alarm-toggle-btn');
+            if (alarmEnabled) {
+                icon.innerText = '🔔';
+                btn.style.borderColor = 'var(--neon-cyan)';
+                btn.style.boxShadow = '0 0 12px var(--neon-cyan-glow)';
+                
+                // Play silent sound to unlock mobile audio context
+                alarmAudio.volume = 0;
+                const playPromise = alarmAudio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        alarmAudio.pause();
+                        alarmAudio.currentTime = 0;
+                        alarmAudio.volume = 1;
+                    }).catch(e => console.log('Audio unlock failed:', e));
+                }
+            } else {
+                icon.innerText = '🔕';
+                btn.style.borderColor = 'var(--border-glass-top)';
+                btn.style.boxShadow = '0 3px 12px rgba(0, 0, 0, 0.4)';
+            }
+        }
+
+        let lastSignalKey = null;
+
+        function triggerAlarm() {
+            if (alarmEnabled) {
+                alarmAudio.currentTime = 0;
+                alarmAudio.play().catch(e => console.log('Audio play blocked:', e));
+                if (navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200, 100, 400]); // Vibrate pattern
+                }
+            }
+        }
+
+        // Live Data Polling
+        async function fetchStatus() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+                renderData(data);
+            } catch (e) {
+                console.log('Error fetching status:', e);
+            }
+        }
+
+        let lastPrice = null;
+        function renderData(data) {
+            // Price & Session with animated bounce & flash
+            if (data.price) {
+                const priceEl = document.getElementById('live-price');
+                const newPrice = Number(data.price);
+                const formatted = '$' + newPrice.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                
+                if (lastPrice !== null && lastPrice !== newPrice) {
+                    priceEl.classList.remove('price-flash-up', 'price-flash-down');
+                    void priceEl.offsetWidth; // trigger reflow
+                    priceEl.classList.add(newPrice > lastPrice ? 'price-flash-up' : 'price-flash-down');
+                }
+                priceEl.innerText = formatted;
+                lastPrice = newPrice;
+            }
+
+            if (data.session) {
+                document.getElementById('session-badge').innerText = data.session.market_badge || data.session.name;
+            }
+            if (data.last_updated) {
+                document.getElementById('last-update').innerText = data.last_updated;
+            }
+
+            // Signal
+            const sig = data.signal;
+            
+            // Alarm Check
+            const currentKey = sig.direction + '_' + (sig.entry || 0);
+            if (sig.direction !== 'WAIT' && currentKey !== lastSignalKey) {
+                if (lastSignalKey !== null) { // Only alarm if it's a new signal after page loaded
+                    triggerAlarm();
+                }
+                lastSignalKey = currentKey;
+            } else if (sig.direction === 'WAIT') {
+                lastSignalKey = null; // Reset on wait
+            }
+
+            const container = document.getElementById('signal-container');
+            const dirEl = document.getElementById('signal-dir');
+            const gradeEl = document.getElementById('signal-grade');
+            const labelEl = document.getElementById('signal-label');
+            const levelsEl = document.getElementById('levels-container');
+
+            container.className = 'card-3d signal-card ' + sig.direction;
+            
+            if (sig.direction === 'BUY') {
+                dirEl.innerHTML = '<span>🟢</span> سیگنال خرید (BUY)';
+            } else if (sig.direction === 'SELL') {
+                dirEl.innerHTML = '<span>🔴</span> سیگنال فروش (SELL)';
+            } else {
+                dirEl.innerHTML = '<span>⏸</span> وضعیت: صبر (WAIT)';
+            }
+
+            gradeEl.innerText = (sig.grade && sig.grade !== 'D') ? 'گرید ' + sig.grade + ' (' + sig.confidence + '%)' : 'احتیاط / پایش';
+            labelEl.innerText = sig.label;
+
+            if (sig.direction !== 'WAIT' && sig.entry) {
+                levelsEl.style.display = 'block';
+                document.getElementById('val-entry').innerText = '$' + Number(sig.entry).toFixed(2);
+                document.getElementById('val-sl').innerText = '$' + Number(sig.sl).toFixed(2);
+                document.getElementById('val-tp1').innerText = '$' + Number(sig.tp1).toFixed(2);
+                document.getElementById('val-tp2').innerText = '$' + Number(sig.tp2).toFixed(2);
+                document.getElementById('val-tp3').innerText = '$' + Number(sig.tp3).toFixed(2);
+            } else {
+                levelsEl.style.display = 'none';
+            }
+
+            // Reasons
+            const reasonsUl = document.getElementById('reasons-list');
+            if (sig.reasons && sig.reasons.length > 0) {
+                reasonsUl.innerHTML = sig.reasons.map(r => '<li>' + r + '</li>').join('');
+            } else {
+                reasonsUl.innerHTML = '<li>شرایط ورود فعلاً احراز نشده است (بازار در فاز تعادل).</li>';
+            }
+
+            // ICT
+            const ict = data.ict;
+            const pointer = document.getElementById('gauge-pointer');
+            const zoneBadge = document.getElementById('ict-zone-badge');
+            
+            if (ict) {
+                let pct = Math.max(0, Math.min(100, ict.current_pct || 50));
+                pointer.style.left = pct + '%';
+
+                if (ict.zone === 'discount') {
+                    zoneBadge.className = 'zone-pill zone-discount';
+                    zoneBadge.innerText = 'منطقه ارزان (Discount)';
+                } else if (ict.zone === 'premium') {
+                    zoneBadge.className = 'zone-pill zone-premium';
+                    zoneBadge.innerText = 'منطقه گران (Premium)';
+                } else {
+                    zoneBadge.className = 'zone-pill zone-equilibrium';
+                    zoneBadge.innerText = 'منطقه تعادل (Equilibrium)';
+                }
+
+                document.getElementById('ict-low').innerText = ict.range_low ? '$' + Number(ict.range_low).toFixed(2) : '—';
+                document.getElementById('ict-high').innerText = ict.range_high ? '$' + Number(ict.range_high).toFixed(2) : '—';
+
+                // DOL & Institutional Levels
+                const dolEl = document.getElementById('ict-dol-val');
+                if (dolEl && ict.dol && ict.dol.target_price) {
+                    const arrow = ict.dol.bias === 'bullish' ? '▲ ' : (ict.dol.bias === 'bearish' ? '▼ ' : '▬ ');
+                    dolEl.innerText = arrow + '$' + Number(ict.dol.target_price).toFixed(2);
+                } else if (dolEl) {
+                    dolEl.innerText = 'تعادل نقدینگی';
+                }
+
+                const instEl = document.getElementById('ict-inst-val');
+                if (instEl && ict.inst_levels && ict.inst_levels.nearest_level_price) {
+                    instEl.innerText = '$' + Number(ict.inst_levels.nearest_level_price).toFixed(2);
+                } else if (instEl) {
+                    instEl.innerText = '—';
+                }
+
+                const ictList = document.getElementById('ict-signals-list');
+                if (ict.signals && ict.signals.length > 0) {
+                    ictList.innerHTML = ict.signals.map(s => '<li>• ' + s + '</li>').join('');
+                } else {
+                    ictList.innerHTML = '<li>هیچ سطح تایید شده فعالی در این لحظه یافت نشد.</li>';
+                }
+            }
+
+            // Technical & MTF
+            const tech = data.technical;
+            if (tech) {
+                document.getElementById('val-rsi').innerText = tech.rsi ? Number(tech.rsi).toFixed(1) : '--';
+                document.getElementById('val-macd').innerText = tech.macd_hist ? (tech.macd_hist > 0 ? '+' : '') + Number(tech.macd_hist).toFixed(2) : '--';
+                document.getElementById('val-ema200').innerText = tech.ema200 ? '$' + Number(tech.ema200).toFixed(0) : '--';
+
+                setMtfTrend('mtf-daily', tech.daily_trend);
+                setMtfTrend('mtf-h4', tech.h4_trend);
+                setMtfTrend('mtf-h1', tech.h1_trend);
+                setMtfTrend('mtf-m15', tech.m15_trend);
+
+                document.getElementById('mtf-overall').innerText = 'برآیند کلی: ' + (tech.overall_trend === 'bullish' ? 'صعودی ▲' : (tech.overall_trend === 'bearish' ? 'نزولی ▼' : 'ترکیبی ▬'));
+            }
+
+            // Weekly
+            const w = data.weekly;
+            if (w) {
+                document.getElementById('weekly-week-id').innerText = w.title || 'هفته جاری';
+                document.getElementById('stat-winrate').innerText = (w.win_rate || 0) + '%';
+                document.getElementById('stat-total').innerText = w.total || 0;
+                document.getElementById('stat-tp').innerText = w.tp_hit_count || 0;
+                document.getElementById('weekly-summary-text').innerText = w.target_hit_summary ? 'موفقیت: ' + w.target_hit_summary : '';
+
+                const histContainer = document.getElementById('history-container');
+                if (w.signals && w.signals.length > 0) {
+                    histContainer.innerHTML = w.signals.map(s => {
+                        let stClass = 'status-active';
+                        if (s.status.includes('TP')) stClass = 'status-tp';
+                        else if (s.status === 'SL_HIT') stClass = 'status-sl';
+                        else if (s.status === 'BREAKEVEN') stClass = 'status-be';
+
+                        return `
+                        <div class="history-item">
+                            <div class="history-left">
+                                <div class="hist-dir ${s.direction}">${s.direction}</div>
+                                <div class="hist-info">
+                                    <div class="hist-id">${s.id} (@ $${s.entry})</div>
+                                    <div class="hist-time">${s.timestamp_local || s.time_only}</div>
+                                </div>
+                            </div>
+                            <div class="hist-status ${stClass}">${s.status_fa || s.status}</div>
+                        </div>
+                        `;
+                    }).join('');
+                } else {
+                    histContainer.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 20px;">هیچ سیگنالی برای این هفته ثبت نشده است.</div>';
+                }
+            }
+        }
+
+        function setMtfTrend(id, trend) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (trend === 'bullish') {
+                el.innerText = 'صعودی ▲';
+                el.className = 'mtf-val trend-bullish';
+            } else if (trend === 'bearish') {
+                el.innerText = 'نزولی ▼';
+                el.className = 'mtf-val trend-bearish';
+            } else {
+                el.innerText = 'خنثی ▬';
+                el.className = 'mtf-val trend-neutral';
+            }
+        }
+
+        async function manualRefresh() {
+            const icon = document.getElementById('refresh-icon');
+            icon.style.display = 'inline-block';
+            icon.style.animation = 'spin 0.8s infinite linear';
+            try {
+                await fetch('/api/refresh', { method: 'POST' });
+                await fetchStatus();
+            } finally {
+                setTimeout(() => { icon.style.animation = 'none'; }, 500);
+            }
+        }
+
+        // Auto poll every 5 seconds
+        fetchStatus();
+        setInterval(fetchStatus, 5000);
+    </script>
+</body>
+</html>
